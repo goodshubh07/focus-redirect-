@@ -1,8 +1,10 @@
 // api/groq.js
 export default async function handler(req, res) {
   try {
-    const { topic } = await req.json ? await req.json() : req.body || {};
-    
+    // Always parse body manually
+    const body = await req.json?.() || {};
+    const topic = body.topic || "general learning";
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
@@ -15,7 +17,7 @@ export default async function handler(req, res) {
         max_tokens: 2048,
         messages: [
           { role: "system", content: "You generate structured JSON roadmaps for learning." },
-          { role: "user", content: `Topic: ${topic || "general learning"}` }
+          { role: "user", content: `Topic: ${topic}` }
         ]
       })
     });
@@ -26,3 +28,4 @@ export default async function handler(req, res) {
     res.status(500).json({ error: e.message });
   }
 }
+
