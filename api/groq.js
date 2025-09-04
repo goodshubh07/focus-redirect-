@@ -18,11 +18,15 @@ export default async function handler(req, res) {
         "Authorization": `Bearer ${process.env.GROQ_API_KEY}`,
       },
       body: JSON.stringify({
-        model: "llama3-8b-8192",
+        model: "llama-3.1-8b-instant",  // 👈 switched from 8192 to instant
         temperature: 0.4,
         max_tokens: 2048,
         messages: [
-          { role: "system", content: "You generate structured JSON roadmaps for learning. Return ONLY valid JSON matching the structure requested in the prompt, with no extra text." },
+          {
+            role: "system",
+            content:
+              "You generate structured JSON roadmaps for learning. Return ONLY valid JSON matching the structure requested in the prompt, with no extra text."
+          },
           { role: "user", content: prompt }
         ],
       }),
@@ -30,7 +34,9 @@ export default async function handler(req, res) {
 
     if (!response.ok) {
       const errText = await response.text();
-      return res.status(response.status).json({ error: `Groq API error: ${errText}` });
+      return res
+        .status(response.status)
+        .json({ error: `Groq API error: ${errText}` });
     }
 
     const data = await response.json();
